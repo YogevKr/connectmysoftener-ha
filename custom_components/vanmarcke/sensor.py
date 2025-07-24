@@ -42,8 +42,10 @@ class ErieSensor(CoordinatorEntity, SensorEntity):
         # Si un device_class est défini, on l'assigne
         if SENSOR_TYPES[sensor_type][3]:
             self._attr_device_class = SENSOR_TYPES[sensor_type][3]
-        # Pour les capteurs cumulés (total_volume et daily_consumption), définir state_class "total" et last_reset
-        if sensor_type in ["total_volume", "daily_consumption"]:
+        # Pour les capteurs cumulés (total_volume et daily_consumption), définir state_class "total", "total_increasing" et last_reset
+        if sensor_type in ["total_volume"]:
+            self._attr_state_class = "total_increasing"
+        if sensor_type in ["daily_consumption"]:
             self._attr_state_class = "total"
             # Définir last_reset au début du jour courant
             self._attr_last_reset = datetime.combine(datetime.now().date(), time())
@@ -55,10 +57,10 @@ class ErieSensor(CoordinatorEntity, SensorEntity):
         """Retourne la valeur actuelle du capteur."""
         current_value = self.coordinator.data.get(self._sensor_type)
     
-        if self._sensor_type == "total_volume" and current_value is not None and current_value == 0:
-            return None  # Ignore les valeurs "0" pour total_volume
+        # if self._sensor_type == "total_volume" and current_value is not None and current_value == 0:
+        #     return None  # Ignore les valeurs "0" pour total_volume
         return current_value
-
+        
     @property
     def unique_id(self):
         """Retourne un ID unique basé sur le type de capteur."""
