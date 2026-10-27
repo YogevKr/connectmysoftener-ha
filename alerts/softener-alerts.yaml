@@ -155,3 +155,21 @@
         tag: softener_nometer
         notification_icon: mdi:water-off-outline
   mode: single
+- id: '1793150100007'
+  alias: Softener meter recovered
+  description: Confirm the first litre counted. Use it after a repair, so you know the meter works again.
+  triggers:
+  - trigger: numeric_state
+    entity_id: sensor.softener_total_treated_water
+    above: 0
+  conditions: []
+  actions:
+  - action: notify.mobile_app_iphone_air_yogev
+    data:
+      title: Softener meter works
+      message: The softener counted its first water, {{ states('sensor.softener_total_treated_water')
+        }} L. The meter is alive again.
+      data:
+        tag: softener_meter_ok
+        notification_icon: mdi:water-check
+  mode: single
