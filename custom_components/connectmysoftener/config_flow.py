@@ -109,7 +109,7 @@ class ConnectMySoftenerConfigFlow(ConfigFlow, domain=DOMAIN):
         await self.async_set_unique_id(str(device["id"]))
         self._abort_if_unique_id_configured()
         return self.async_create_entry(
-            title=device["name"],
+            title=f"Softener {device['id']}",
             data={"email": email, "password": password, "device_id": device["id"]},
         )
 

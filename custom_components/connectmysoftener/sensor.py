@@ -175,6 +175,8 @@ class SoftenerFlowSensor(SoftenerSensor):
         """Set up the entity."""
         super().__init__(coordinator, description)
         self._value: float | None = None
+        # A flow that keeps the same value is still a fresh measurement.
+        self._attr_force_update = True
 
     @property
     def native_value(self) -> Any:
