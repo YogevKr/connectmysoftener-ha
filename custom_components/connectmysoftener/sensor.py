@@ -194,7 +194,12 @@ class SoftenerFlowSensor(SoftenerSensor):
 
     async def _async_update_flow(self, now: datetime) -> None:
         """Read the flow and write it to the state machine."""
-        value = await self.coordinator.async_get_flow()
+        try:
+            value = await self.coordinator.async_get_flow()
+        except Exception as err:  # noqa: BLE001 - a timer task must never fail
+            # Home Assistant closes the shared session while it shuts down.
+            _LOGGER.debug("Flow update failed: %s", err)
+            return
         if value is None:
             return
         self._value = value

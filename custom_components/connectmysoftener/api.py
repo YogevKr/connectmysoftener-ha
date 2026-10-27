@@ -149,7 +149,7 @@ class ConnectMySoftenerApi:
                 json=payload,
                 timeout=REQUEST_TIMEOUT,
             )
-        except (aiohttp.ClientError, TimeoutError) as err:
+        except (aiohttp.ClientError, TimeoutError, RuntimeError) as err:
             raise CannotConnect(f"Login failed: {err}") from err
 
         async with response:
@@ -182,7 +182,7 @@ class ConnectMySoftenerApi:
                 headers=self._auth_headers,
                 timeout=REQUEST_TIMEOUT,
             )
-        except (aiohttp.ClientError, TimeoutError) as err:
+        except (aiohttp.ClientError, TimeoutError, RuntimeError) as err:
             raise CannotConnect(f"GET {path} failed: {err}") from err
 
         async with response:

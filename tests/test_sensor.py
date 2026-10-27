@@ -78,3 +78,21 @@ def test_every_sensor_has_a_name(key: str) -> None:
     description = next(item for item in SENSORS if item.key == key)
 
     assert description.name
+
+
+class RaisingCoordinator(FakeCoordinator):
+    """Coordinator whose flow call fails, as during a shutdown."""
+
+    async def async_get_flow(self) -> float | None:
+        """Raise like a closed aiohttp session."""
+        raise RuntimeError("Session is closed")
+
+
+def test_flow_sensor_survives_a_closed_session() -> None:
+    """The timer task must not raise when Home Assistant shuts down."""
+    entity = build_flow_sensor(RaisingCoordinator(1.0))
+    entity.async_write_ha_state = lambda: None  # type: ignore[method-assign]
+
+    asyncio.run(entity._async_update_flow(None))  # type: ignore[arg-type]
+
+    assert entity.native_value == 1.0
