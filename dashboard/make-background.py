@@ -14,9 +14,30 @@ from PIL import Image, ImageChops, ImageDraw, ImageFilter
 WIDTH, HEIGHT = 1920, 1080
 
 VARIANTS = {
-    "deep-sea": (((4, 10, 16), (7, 24, 33)), (((0.34, 0.44, 560, (0, 120, 165), 0.70), (0.76, 0.68, 480, (0, 150, 150), 0.35), (0.58, 0.16, 660, (14, 52, 88), 0.45)))),
-    "teal": (((5, 11, 15), (8, 26, 28)), (((0.66, 0.40, 540, (0, 140, 150), 0.62), (0.22, 0.72, 520, (70, 130, 90), 0.30), (0.44, 0.90, 520, (12, 70, 110), 0.45)))),
-    "ocean-bright": (((5, 16, 26), (10, 38, 54)), (((0.30, 0.42, 620, (0, 150, 205), 0.85), (0.78, 0.72, 520, (0, 205, 200), 0.45), (0.55, 0.20, 700, (20, 70, 120), 0.55)))),
+    "deep-sea": (
+        ((4, 10, 16), (7, 24, 33)),
+        (
+            (0.34, 0.44, 560, (0, 120, 165), 0.70),
+            (0.76, 0.68, 480, (0, 150, 150), 0.35),
+            (0.58, 0.16, 660, (14, 52, 88), 0.45),
+        ),
+    ),
+    "teal": (
+        ((5, 11, 15), (8, 26, 28)),
+        (
+            (0.66, 0.40, 540, (0, 140, 150), 0.62),
+            (0.22, 0.72, 520, (70, 130, 90), 0.30),
+            (0.44, 0.90, 520, (12, 70, 110), 0.45),
+        ),
+    ),
+    "ocean-bright": (
+        ((5, 16, 26), (10, 38, 54)),
+        (
+            (0.30, 0.42, 620, (0, 150, 205), 0.85),
+            (0.78, 0.72, 520, (0, 205, 200), 0.45),
+            (0.55, 0.20, 700, (20, 70, 120), 0.55),
+        ),
+    ),
 }
 
 
@@ -33,7 +54,14 @@ def gradient(top: tuple[int, int, int], bottom: tuple[int, int, int]) -> Image.I
     return image
 
 
-def add_glow(image: Image.Image, x: float, y: float, radius: float, color: tuple[int, int, int], strength: float) -> Image.Image:
+def add_glow(
+    image: Image.Image,
+    x: float,
+    y: float,
+    radius: float,
+    color: tuple[int, int, int],
+    strength: float,
+) -> Image.Image:
     """Add one soft radial glow."""
     layer = Image.new("RGB", (WIDTH, HEIGHT), (0, 0, 0))
     draw = ImageDraw.Draw(layer)
