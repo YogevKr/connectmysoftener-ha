@@ -28,9 +28,24 @@ The device page also shows the serial number and the software version.
 
 ## Screenshot
 
-![Entity list](preview.png)
+![Softener dashboard](preview.png)
 
-This is an old upstream screenshot. This fork uses English names.
+The ready-made dashboard is in [`dashboard/softener.yaml`](dashboard/softener.yaml).
+To use it, add the content as a YAML dashboard in your `configuration.yaml`:
+
+```yaml
+lovelace:
+  dashboards:
+    softener:
+      mode: yaml
+      title: Softener
+      icon: mdi:water-check
+      show_in_sidebar: true
+      filename: dashboard/softener.yaml
+```
+
+It uses Bubble Card, Mushroom and mini-graph-card, which you install with
+HACS. Delete the `theme:` line to keep the default theme.
 
 ## How it works
 
