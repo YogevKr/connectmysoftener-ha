@@ -1,7 +1,7 @@
 {
   "domain": "connectmysoftener",
   "name": "ConnectMySoftener (Pentair / Erie)",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "config_flow": true,
   "documentation": "https://github.com/YogevKr/connectmysoftener-ha",
   "issue_tracker": "https://github.com/YogevKr/connectmysoftener-ha/issues",

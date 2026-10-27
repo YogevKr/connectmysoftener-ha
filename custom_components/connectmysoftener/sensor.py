@@ -195,7 +195,8 @@ class SoftenerFlowSensor(SoftenerSensor):
     async def _async_update_flow(self, now: datetime) -> None:
         """Read the flow and write it to the state machine."""
         value = await self.coordinator.async_get_flow()
-        if value is None or value == self._value:
+        if value is None:
             return
         self._value = value
+        # `force_update` makes a repeated reading a fresh measurement.
         self.async_write_ha_state()
