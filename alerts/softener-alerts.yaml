@@ -1,7 +1,7 @@
 - id: '1793150100001'
   alias: Softener salt low
-  description: Warn when the softener salt tank runs low. Sends one alert at 20 % and a
-    second, sharper alert at 10 %.
+  description: Warn when the softener salt tank runs low. Sends one alert at 20 % and a second, sharper
+    alert at 10 %.
   triggers:
   - trigger: numeric_state
     entity_id: sensor.softener_salt_level
@@ -21,18 +21,15 @@
   - action: notify.mobile_app_iphone_air_yogev
     data:
       title: Softener salt low
-      message: >-
-        Salt is at {{ states('sensor.softener_salt_level') }} % with about
-        {{ states('sensor.softener_days_until_regeneration') }} days of soft water left.
-        Fill the salt tank.
+      message: Salt is at {{ states('sensor.softener_salt_level') }} % with about {{ states('sensor.softener_days_until_regeneration')
+        }} days of soft water left. Fill the salt tank.
       data:
         tag: softener_salt
         notification_icon: mdi:shaker-alert
   - action: notify.mobile_app_tals_iphone
     data:
       title: Softener salt low
-      message: >-
-        Salt is at {{ states('sensor.softener_salt_level') }} %. Fill the salt tank.
+      message: Salt is at {{ states('sensor.softener_salt_level') }} %. Fill the salt tank.
       data:
         tag: softener_salt
         notification_icon: mdi:shaker-alert
@@ -51,18 +48,17 @@
   - action: notify.mobile_app_iphone_air_yogev
     data:
       title: Softener regeneration is close
-      message: >-
-        About {{ states('sensor.softener_days_until_regeneration') }} days of soft water
-        left, {{ states('sensor.softener_remaining_water') }} L. Salt level
-        {{ states('sensor.softener_salt_level') }} %.
+      message: About {{ states('sensor.softener_days_until_regeneration') }} days of soft water left,
+        {{ states('sensor.softener_remaining_water') }} L. Salt level {{ states('sensor.softener_salt_level')
+        }} %.
       data:
         tag: softener_regen_soon
         notification_icon: mdi:calendar-end
   mode: single
 - id: '1793150100003'
   alias: Softener continuous flow
-  description: Warn when water runs for 45 minutes without a stop. A tap left open, a
-    leaking toilet or a burst pipe.
+  description: Warn when water runs for 45 minutes without a stop. A tap left open, a leaking toilet or
+    a burst pipe.
   triggers:
   - trigger: numeric_state
     entity_id: sensor.softener_water_flow
@@ -74,25 +70,23 @@
   - action: notify.mobile_app_iphone_air_yogev
     data:
       title: Water runs for 45 minutes
-      message: >-
-        The softener measures {{ states('sensor.softener_water_flow') }} L/min for 45
-        minutes. Check for a tap, a toilet or a leak.
+      message: The softener measures {{ states('sensor.softener_water_flow') }} L/min for 45 minutes.
+        Check for a tap, a toilet or a leak.
       data:
         tag: softener_flow
         notification_icon: mdi:water-pump
   - action: notify.mobile_app_tals_iphone
     data:
       title: Water runs for 45 minutes
-      message: >-
-        The softener measures flow for 45 minutes. Check for an open tap or a leak.
+      message: The softener measures flow for 45 minutes. Check for an open tap or a leak.
       data:
         tag: softener_flow
         notification_icon: mdi:water-pump
   mode: single
 - id: '1793150100004'
   alias: Softener offline
-  description: Warn when the softener controller stops answering the cloud for 30
-    minutes. Check the Wi-Fi and the power of the unit.
+  description: Warn when the softener controller stops answering the cloud for 30 minutes. Check the Wi-Fi
+    and the power of the unit.
   triggers:
   - trigger: state
     entity_id: sensor.softener_status
@@ -119,37 +113,44 @@
     entity_id: sensor.softener_regenerations
   conditions:
   - condition: template
-    value_template: '{{ trigger.from_state is not none and trigger.to_state.state not in
-      ["unknown", "unavailable"] and trigger.from_state.state not in ["unknown", "unavailable"] }}'
+    value_template: '{{ trigger.from_state is not none and trigger.to_state.state not in ["unknown", "unavailable"]
+      and trigger.from_state.state not in ["unknown", "unavailable"] }}'
   actions:
   - action: notify.mobile_app_iphone_air_yogev
     data:
       title: Softener regenerated
-      message: >-
-        Regeneration number {{ states('sensor.softener_regenerations') }} finished.
-        Salt level {{ states('sensor.softener_salt_level') }} %.
+      message: Regeneration number {{ states('sensor.softener_regenerations') }} finished. Salt level
+        {{ states('sensor.softener_salt_level') }} %.
       data:
         tag: softener_regen_done
         notification_icon: mdi:autorenew
   mode: single
 - id: '1793150100006'
   alias: Softener counts no water
-  description: Warn when the softener has counted no water for six hours. The usual
-    cause is a bypass, a closed inlet or outlet handle, or a broken meter.
+  description: Warn when the softener counts no water. Fires six hours after the state goes flat, and
+    again each evening at 20:00 while it lasts. The usual cause is a bypass, a closed inlet or outlet
+    handle, or a broken meter.
   triggers:
   - trigger: numeric_state
     entity_id: sensor.softener_total_treated_water
     below: 1
     for:
       hours: 6
-  conditions: []
+  - trigger: time
+    at: '20:00:00'
+  conditions:
+  - condition: numeric_state
+    entity_id: sensor.softener_total_treated_water
+    below: 1
+  - condition: template
+    value_template: '{{ states("sensor.softener_status") not in ["unavailable", "unknown"] }}'
   actions:
   - action: notify.mobile_app_iphone_air_yogev
     data:
       title: Softener counts no water
-      message: >-
-        Total treated water is still 0 L. Check the bypass knob and the inlet and outlet
-        handles on the unit.
+      message: Total treated water is still 0 L after {{ states('sensor.softener_salt_level') }} % salt
+        and {{ states('sensor.softener_days_until_regeneration') }} days left. Check the bypass knob and
+        the inlet and outlet handles on the unit.
       data:
         tag: softener_nometer
         notification_icon: mdi:water-off-outline
