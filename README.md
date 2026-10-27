@@ -99,5 +99,10 @@ uv run --with ruff ruff check .
 
 ## License
 
-See [LICENSE](LICENSE). The upstream terms stay in force: non-commercial use
-with attribution, and shared changes.
+[CC BY-NC-SA 4.0](LICENSE). Copyright (c) 2025 lemick007, changes (c) 2026
+YogevKr.
+
+Non-commercial use is free. Name the source, and keep changed versions under
+the same license. The upstream terms of
+[`lemick007/vanmarcke-softener`](https://github.com/lemick007/vanmarcke-softener)
+stay in force.
