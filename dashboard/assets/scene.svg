@@ -1,0 +1,70 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 560" width="800" height="560">
+  <defs>
+    <linearGradient id="cab" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#3b5c73"/><stop offset="1" stop-color="#1e3140"/>
+    </linearGradient>
+    <linearGradient id="cabDark" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#2b4557"/><stop offset="1" stop-color="#16242f"/>
+    </linearGradient>
+    <linearGradient id="pipe" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#7fa8bf"/><stop offset="0.45" stop-color="#4d6f85"/><stop offset="1" stop-color="#2b4353"/>
+    </linearGradient>
+    <linearGradient id="tankShell" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#ffffff" stop-opacity="0.16"/>
+      <stop offset="0.35" stop-color="#ffffff" stop-opacity="0.05"/>
+      <stop offset="1" stop-color="#ffffff" stop-opacity="0.18"/>
+    </linearGradient>
+    <linearGradient id="screen" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#06202c"/><stop offset="1" stop-color="#04141d"/>
+    </linearGradient>
+    <filter id="soft" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="10"/>
+    </filter>
+  </defs>
+
+  <!-- floor shadow -->
+  <ellipse cx="330" cy="520" rx="330" ry="16" fill="#000" opacity="0.28" filter="url(#soft)"/>
+  <rect x="20" y="516" width="760" height="3" rx="1.5" fill="#ffffff" opacity="0.07"/>
+
+  <!-- brine tank -->
+  <ellipse cx="160" cy="480" rx="92" ry="14" fill="#000" opacity="0.25" filter="url(#soft)"/>
+  <path d="M70 174 a90 26 0 0 1 180 0 v296 a90 22 0 0 1 -180 0 z" fill="url(#tankShell)" stroke="#8fc2da" stroke-opacity="0.55" stroke-width="3"/>
+  <ellipse cx="160" cy="174" rx="90" ry="26" fill="#ffffff" fill-opacity="0.07" stroke="#8fc2da" stroke-opacity="0.55" stroke-width="3"/>
+  <ellipse cx="160" cy="174" rx="72" ry="19" fill="#0d2230" fill-opacity="0.55"/>
+  <!-- lid -->
+  <ellipse cx="160" cy="164" rx="96" ry="28" fill="url(#cabDark)" stroke="#9ec9de" stroke-opacity="0.5" stroke-width="3"/>
+  <ellipse cx="160" cy="160" rx="70" ry="18" fill="#ffffff" fill-opacity="0.08"/>
+  <path d="M118 156 h84" stroke="#cfe8f4" stroke-opacity="0.35" stroke-width="3" stroke-linecap="round"/>
+
+  <!-- softener cabinet -->
+  <rect x="332" y="132" width="266" height="348" rx="18" fill="url(#cab)" stroke="#7ea6bd" stroke-opacity="0.55" stroke-width="3"/>
+  <rect x="332" y="132" width="266" height="348" rx="18" fill="#000" opacity="0.10"/>
+  <rect x="348" y="148" width="234" height="316" rx="12" fill="url(#cabDark)" stroke="#ffffff" stroke-opacity="0.08" stroke-width="2"/>
+  <!-- control head -->
+  <rect x="378" y="96" width="174" height="52" rx="12" fill="url(#cabDark)" stroke="#7ea6bd" stroke-opacity="0.55" stroke-width="3"/>
+  <rect x="398" y="108" width="134" height="28" rx="8" fill="#0a1c26" stroke="#00bcd4" stroke-opacity="0.45" stroke-width="2"/>
+  <circle cx="536" cy="122" r="7" fill="#00e5ff" opacity="0.85"/>
+  <!-- screen -->
+  <rect x="392" y="184" width="146" height="86" rx="10" fill="url(#screen)" stroke="#00bcd4" stroke-opacity="0.5" stroke-width="2"/>
+  <rect x="392" y="184" width="146" height="86" rx="10" fill="#00bcd4" opacity="0.06"/>
+  <!-- vents -->
+  <g stroke="#ffffff" stroke-opacity="0.10" stroke-width="2">
+    <path d="M404 320 h122"/><path d="M404 332 h122"/><path d="M404 344 h122"/><path d="M404 356 h122"/>
+  </g>
+  <!-- badge plate -->
+  <rect x="404" y="392" width="122" height="46" rx="10" fill="#0d2230" fill-opacity="0.5" stroke="#ffffff" stroke-opacity="0.10"/>
+
+  <!-- pipes -->
+  <rect x="596" y="192" width="204" height="20" rx="10" fill="url(#pipe)"/>
+  <rect x="596" y="422" width="204" height="20" rx="10" fill="url(#pipe)"/>
+  <rect x="588" y="444" width="16" height="20" rx="4" fill="#4d6f85"/>
+  <!-- valve -->
+  <circle cx="700" cy="202" r="26" fill="url(#cabDark)" stroke="#9ec9de" stroke-opacity="0.55" stroke-width="3"/>
+  <circle cx="700" cy="202" r="12" fill="#00bcd4" opacity="0.55"/>
+  <path d="M700 176 v-14" stroke="#9ec9de" stroke-opacity="0.6" stroke-width="4" stroke-linecap="round"/>
+  <!-- brine tube from cabinet to tank -->
+  <path d="M332 300 C 280 300 250 230 214 180" stroke="#9ec9de" stroke-opacity="0.5" stroke-width="7" fill="none" stroke-linecap="round"/>
+  <!-- drain -->
+  <path d="M420 480 v44 h180" stroke="#6f93a8" stroke-opacity="0.6" stroke-width="9" fill="none" stroke-linecap="round"/>
+  <rect x="600" y="516" width="10" height="10" rx="2" fill="#6f93a8" opacity="0.6"/>
+</svg>
