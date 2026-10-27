@@ -1,4 +1,4 @@
-background: 'center / cover no-repeat url("/local/bg3.jpg") fixed'
+background: 'center / cover no-repeat url("/local/softener-bg.jpg") fixed'
 views:
   - title: Softener
     path: softener
