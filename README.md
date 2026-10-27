@@ -1,60 +1,103 @@
-# vanmarcke-softener
-Home Assistant integration (ConnectMySoftener)
+# ConnectMySoftener for Home Assistant
 
-# Intégration Adoucisseur Van Marcke (Pentair) pour Home Assistant
+A Home Assistant integration for Pentair / Erie water softeners that use the
+**ConnectMySoftener** app (Erie, Van Marcke and other Pentair brands).
 
-⚠️ **Note importante** :  
-Ce projet **n'est pas affilié** à Van Marcke ou Pentair. Développé par un particulier pour usage personnel, partagé publiquement à titre informatif. L'intégration peut présenter des bugs et n'est pas maintenue professionnellement.
+Fork of [`lemick007/vanmarcke-softener`](https://github.com/lemick007/vanmarcke-softener).
 
-## Fonctionnalités principales
-- **Données en temps réel** :
-  - Débit d'eau (L/min)
-  - Niveau de sel (%)
-  - Volume d'eau restant (L)
-  
-- **Historique et maintenance** :
-  - Consommation journalière
-  - Dernière régénération (date/heure)
-  - Jours restants avant régénération
-  - Nombre total de régénérations
-  
-- **Informations système** :
-  - Version du logiciel
-  - Volume total traité
- 
+Not affiliated with Pentair, Erie or Van Marcke. Use at your own risk.
 
-![Exemple de dashboard](https://raw.githubusercontent.com/lemick007/vanmarcke-softener/main/preview.png) *Interface indicative*
+## What it gives you
 
-## Installation via HACS
-1. Installer [HACS](https://hacs.xyz/) si ce n'est pas déjà fait
-2. Dans HACS > **Intégrations** :
-URL du dépôt : https://github.com/lemick007/vanmarcke-softener
-Catégorie : Intégration
-3. Redémarrer Home Assistant
-4. Ajouter via `Configuration > Appareils & Services > + Ajouter une intégration`
+| Entity | Unit | Notes |
+| --- | --- | --- |
+| `sensor.<device>_status` | – | For example `In Service` |
+| `sensor.<device>_salt_level` | % | |
+| `sensor.<device>_remaining_water` | L | Water left before the next regeneration |
+| `sensor.<device>_days_until_regeneration` | d | |
+| `sensor.<device>_last_regeneration` | timestamp | |
+| `sensor.<device>_regenerations` | – | Total count |
+| `sensor.<device>_total_treated_water` | L | |
+| `sensor.<device>_daily_consumption` | L | Resets at local midnight |
+| `sensor.<device>_water_flow` | L/min | Polled every 30 seconds |
+| `sensor.<device>_software_version` | – | Diagnostic |
 
-[![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=lemick007&repository=vanmarcke-softener&category=Integrations)
-## Pré-requis
-Il faut avoir installé l'application de votre adoucisseur (connectmysoftener ou autre) pour avoir un compte, et le connecter au wi-fi !
+The device page also shows the serial number and the software version.
 
-## Dépannage courant
-| Problème | Solution |
-|----------|----------|
-| Entités non créées | Vérifier les logs HA (`/config/home-assistant.log`) |
-| Données non mises à jour | Redémarrer l'adoucisseur et HA |
-| Erreur d'authentification | Réinitialiser votre mot de passe |
+## How it works
 
-## Mentions légales
-ℹ️ Van Marcke® et Pentair® sont des marques déposées de leurs propriétaires respectifs. Ce projet n'implique aucune relation commerciale ou technique avec ces sociétés. Utilisation à vos risques.
+The integration logs in to the Pentair cloud API with the account of the
+ConnectMySoftener app. It polls the API and never talks to the softener
+directly.
 
-## Licence
-Copyright (c) 2025
-Permission d'utilisation accordée sous conditions :
-1. Usage non-commercial autorisé avec attribution
-2. Interdiction de vendre/intégrer dans produits payants
-3. Modifications obligatoirement partagées sous même licence
+```mermaid
+graph LR
+  S[Softener] -->|Wi-Fi| P[Pentair cloud API]
+  P -->|poll| I[This integration]
+  I --> H[Home Assistant]
+```
 
----
+The only public endpoint is `connectmysoftenerapi.pentair.eu`. Accounts from
+every region use it.
 
-❤️ **Contributions bienvenues** :  
-[Ouvrir une issue] | [Proposer une PR] | [Support via GitHub Discussions]
+## Install
+
+1. Install [HACS](https://hacs.xyz/).
+2. HACS → Integrations → three-dot menu → **Custom repositories**.
+3. Add `https://github.com/YogevKr/connectmysoftener-ha` with category
+   **Integration**.
+4. Download it, then restart Home Assistant.
+
+[![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=YogevKr&repository=connectmysoftener-ha&category=Integrations)
+
+## Set up
+
+1. Install the ConnectMySoftener app and connect the softener to Wi-Fi.
+2. Home Assistant → Settings → Devices & Services → **Add integration** →
+   **ConnectMySoftener**.
+3. Enter the email and the password of the app.
+
+## Options
+
+**Poll interval** sets how often the values refresh. The default is 300
+seconds. The water flow keeps its own 30 second poll, because a slow poll
+almost always misses the flow.
+
+## Limits
+
+- The values are cloud values, not live device values. The cloud is the only
+  source.
+- A flow reading is a snapshot. Short water use can stay unseen.
+- The API is private and can change without notice.
+- The payload of `last_regeneration` is empty on a new device. The parser
+  reads ISO 8601 and a few common shapes, and logs a warning when it meets an
+  unknown shape.
+
+## Troubleshooting
+
+| Problem | Fix |
+| --- | --- |
+| `invalid_auth` | Check the email and the password. Try the app first. |
+| `cannot_connect` | Check the internet connection of Home Assistant. |
+| `no_devices` | The account holds no softener. Pair it in the app. |
+| Values freeze | Look at the log for `connectmysoftener`. |
+
+Enable debug logging:
+
+```yaml
+logger:
+  logs:
+    custom_components.connectmysoftener: debug
+```
+
+## Test
+
+```sh
+uv run --with homeassistant --with pytest --with aiohttp pytest
+uv run --with ruff ruff check .
+```
+
+## License
+
+See [LICENSE](LICENSE). The upstream terms stay in force: non-commercial use
+with attribution, and shared changes.

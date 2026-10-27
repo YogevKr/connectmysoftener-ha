@@ -1,0 +1,17 @@
+[project]
+name = "connectmysoftener-ha"
+version = "0.2.0"
+description = "Home Assistant integration for Pentair / Erie ConnectMySoftener water softeners"
+requires-python = ">=3.14"
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["tests"]
+addopts = "-q"
+
+[tool.ruff]
+line-length = 100
+target-version = "py314"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM", "RUF"]

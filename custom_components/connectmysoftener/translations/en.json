@@ -1,0 +1,51 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "ConnectMySoftener account",
+        "description": "Use the email and the password of the ConnectMySoftener app.",
+        "data": {
+          "email": "Email",
+          "password": "Password"
+        }
+      },
+      "select_device": {
+        "title": "Select a softener",
+        "data": {
+          "device_id": "Softener"
+        }
+      },
+      "reauth_confirm": {
+        "title": "Log in again",
+        "description": "The cloud rejected the stored password.",
+        "data": {
+          "email": "Email",
+          "password": "Password"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Cannot reach the ConnectMySoftener cloud.",
+      "invalid_auth": "The email or the password is wrong.",
+      "no_devices": "This account holds no softener.",
+      "unknown": "Unexpected error. Check the log."
+    },
+    "abort": {
+      "already_configured": "This softener is already set up.",
+      "reauth_successful": "The password is updated."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Options",
+        "data": {
+          "scan_interval": "Poll interval"
+        },
+        "data_description": {
+          "scan_interval": "How often Home Assistant reads the values of the softener. The water flow always uses 30 seconds."
+        }
+      }
+    }
+  }
+}

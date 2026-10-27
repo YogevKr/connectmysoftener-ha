@@ -1,0 +1,13 @@
+{
+  "domain": "connectmysoftener",
+  "name": "ConnectMySoftener (Pentair / Erie)",
+  "version": "0.2.0",
+  "config_flow": true,
+  "documentation": "https://github.com/YogevKr/connectmysoftener-ha",
+  "issue_tracker": "https://github.com/YogevKr/connectmysoftener-ha/issues",
+  "codeowners": ["@YogevKr"],
+  "requirements": ["aiohttp>=3.8.1"],
+  "iot_class": "cloud_polling",
+  "integration_type": "hub",
+  "loggers": ["custom_components.connectmysoftener"]
+}

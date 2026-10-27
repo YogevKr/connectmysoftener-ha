@@ -1,0 +1,34 @@
+name: Tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: astral-sh/setup-uv@v5
+
+      - name: Lint
+        run: uv run --python 3.14 --with ruff ruff check .
+
+      - name: Format
+        run: uv run --python 3.14 --with ruff ruff format --check .
+
+      - name: Test
+        run: uv run --python 3.14 --with homeassistant --with pytest --with aiohttp pytest
+
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: home-assistant/actions/hassfest@master
+
+      - uses: hacs/action@main
+        with:
+          category: integration
