@@ -1,5 +1,7 @@
 # ConnectMySoftener for Home Assistant
 
+<img src="custom_components/connectmysoftener/brand/logo.png" alt="ConnectMySoftener" width="360">
+
 A Home Assistant integration for Pentair / Erie water softeners that use the
 **ConnectMySoftener** app (Erie, Van Marcke and other Pentair brands).
 
@@ -23,6 +25,12 @@ Not affiliated with Pentair, Erie or Van Marcke. Use at your own risk.
 | `sensor.<device>_software_version` | – | Diagnostic |
 
 The device page also shows the serial number and the software version.
+
+## Screenshot
+
+![Entity list](preview.png)
+
+This is an old upstream screenshot. This fork uses English names.
 
 ## How it works
 

@@ -93,6 +93,13 @@ def test_parse_data_reads_an_iso_regeneration_date() -> None:
     assert result["last_regeneration"] == datetime(2026, 10, 27, 9, 11, 31, 575000, tzinfo=UTC)
 
 
+def test_parse_data_reads_a_regeneration_date_with_an_offset() -> None:
+    """The date shape of the live API is accepted."""
+    result = parse_data(build_payload(info={"last_regeneration": "2025-02-02T23:02:16+00:00"}))
+
+    assert result["last_regeneration"] == datetime(2025, 2, 2, 23, 2, 16, tzinfo=UTC)
+
+
 @pytest.mark.parametrize(
     ("payload", "key"),
     [
@@ -128,6 +135,8 @@ def test_parse_number_reads_the_leading_number() -> None:
         (None, None),
         ("2026-10-27T09:11:31Z", datetime(2026, 10, 27, 9, 11, 31, tzinfo=UTC)),
         ("2026-10-27 09:11:31", datetime(2026, 10, 27, 9, 11, 31, tzinfo=UTC)),
+        # The shape that the real API uses when a regeneration happened.
+        ("2025-02-02T23:02:16+00:00", datetime(2025, 2, 2, 23, 2, 16, tzinfo=UTC)),
         ("27/10/2026 09:11", datetime(2026, 10, 27, 9, 11, tzinfo=UTC)),
         ("nonsense", None),
     ],

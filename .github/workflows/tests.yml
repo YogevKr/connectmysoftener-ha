@@ -32,3 +32,6 @@ jobs:
       - uses: hacs/action@main
         with:
           category: integration
+          # CC BY-NC-SA 4.0 is not in the GitHub license list, so the license
+          # check cannot read it. See LICENSE.
+          ignore: license
