@@ -1,6 +1,6 @@
 [project]
 name = "connectmysoftener-ha"
-version = "0.2.7"
+version = "0.2.8"
 description = "Home Assistant integration for Pentair / Erie ConnectMySoftener water softeners"
 requires-python = ">=3.14"
 

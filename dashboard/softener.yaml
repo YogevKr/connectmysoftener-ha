@@ -4,208 +4,256 @@ views:
     path: softener
     icon: mdi:water-check
     theme: Frosted Glass
-    cards:
-      # Status chips -------------------------------------------------------
-      - type: custom:bubble-card
-        card_type: sub-buttons
-        hide_main_background: true
-        rows: 0.9
-        sub_button:
-          main: []
-          bottom:
-            - name: chips
-              buttons_layout: inline
-              justify_content: center
-              group:
-                - entity: sensor.softener_status
-                  name: Status
-                  show_name: false
-                  show_icon: true
-                  state_content: state
-                  fill_width: true
-                - entity: sensor.softener_salt_level
-                  name: Salt
-                  show_name: false
-                  show_icon: true
-                  state_content: state
-                  fill_width: true
-                - entity: sensor.softener_days_until_regeneration
-                  name: Days
-                  show_name: false
-                  show_icon: true
-                  state_content: state
-                  fill_width: true
+    type: sections
+    max_columns: 3
+    sections:
+      # Status -------------------------------------------------------------
+      - type: grid
+        cards:
+          - type: custom:bubble-card
+            card_type: sub-buttons
+            hide_main_background: true
+            rows: 0.9
+            sub_button:
+              main: []
+              bottom:
+                - name: chips
+                  buttons_layout: inline
+                  justify_content: center
+                  group:
+                    - entity: sensor.softener_status
+                      name: Status
+                      show_name: false
+                      show_icon: true
+                      state_content: state
+                      fill_width: true
+                    - entity: sensor.softener_salt_level
+                      name: Salt
+                      show_name: false
+                      show_icon: true
+                      state_content: state
+                      fill_width: true
+                    - entity: sensor.softener_days_until_regeneration
+                      name: Days
+                      show_name: false
+                      show_icon: true
+                      state_content: state
+                      fill_width: true
 
-      # Salt level ---------------------------------------------------------
-      - type: custom:mushroom-template-card
-        primary: Salt level
-        secondary: >-
-          {{ states('sensor.softener_salt_level') }} % left ·
-          {{ states('sensor.softener_days_until_regeneration') }} days until regeneration
-        icon: >-
-          {% set s = states('sensor.softener_salt_level') | float(0) %}
-          {% if s < 15 %} mdi:shaker-alert {% elif s < 35 %} mdi:shaker-outline {% else %} mdi:shaker {% endif %}
-        icon_color: >-
-          {% set s = states('sensor.softener_salt_level') | float(0) %}
-          {% if s < 15 %} red {% elif s < 35 %} orange {% else %} blue {% endif %}
-        tap_action:
-          action: more-info
-          entity: sensor.softener_salt_level
-        card_mod:
-          style: |
-            ha-card {
-              --bar: {{ states('sensor.softener_salt_level') | float(0) }};
-              --bar-color: {% set s = states('sensor.softener_salt_level') | float(0) %}{% if s < 15 %} #f44336 {% elif s < 35 %} #ff9800 {% else %} #2196f3 {% endif %};
-              position: relative;
-              overflow: hidden;
-              padding-bottom: 14px;
-            }
-            ha-card::after {
-              content: "";
-              position: absolute;
-              inset: auto auto 0 0;
-              height: 6px;
-              width: calc(var(--bar) * 1%);
-              background: var(--bar-color);
-              border-radius: 0 8px 8px 0;
-              transition: width 0.4s ease;
-            }
+          - type: custom:mushroom-template-card
+            grid_options:
+              columns: 12
+            primary: Salt level
+            secondary: >-
+              {{ states('sensor.softener_salt_level') }} % left ·
+              {{ states('sensor.softener_days_until_regeneration') }} days until regeneration
+            icon: >-
+              {% set s = states('sensor.softener_salt_level') | float(0) %}
+              {% if s < 15 %} mdi:shaker-alert {% elif s < 35 %} mdi:shaker-outline {% else %} mdi:shaker {% endif %}
+            icon_color: >-
+              {% set s = states('sensor.softener_salt_level') | float(0) %}
+              {% if s < 15 %} red {% elif s < 35 %} orange {% else %} blue {% endif %}
+            tap_action:
+              action: more-info
+              entity: sensor.softener_salt_level
+            card_mod:
+              style: |
+                ha-card {
+                  --bar: {{ states('sensor.softener_salt_level') | float(0) }};
+                  --bar-color: {% set s = states('sensor.softener_salt_level') | float(0) %}{% if s < 15 %} #f44336 {% elif s < 35 %} #ff9800 {% else %} #2196f3 {% endif %};
+                  position: relative;
+                  overflow: hidden;
+                  padding-bottom: 14px;
+                }
+                ha-card::after {
+                  content: "";
+                  position: absolute;
+                  inset: auto auto 0 0;
+                  height: 6px;
+                  width: calc(var(--bar) * 1%);
+                  background: var(--bar-color);
+                  border-radius: 0 8px 8px 0;
+                  transition: width 0.4s ease;
+                }
 
-      # Low salt warning (only when the tank runs low) ---------------------
-      - type: conditional
-        conditions:
-          - condition: numeric_state
-            entity: sensor.softener_salt_level
-            below: 25
-        card:
-          type: custom:mushroom-template-card
-          primary: Refill the salt tank
-          secondary: >-
-            Only {{ states('sensor.softener_salt_level') }} % left, about
-            {{ states('sensor.softener_days_until_regeneration') }} days of soft water
-          icon: mdi:shaker-alert
-          icon_color: orange
-          tap_action:
-            action: more-info
-            entity: sensor.softener_salt_level
+          # Shown until the softener counts the first litre.
+          - type: conditional
+            conditions:
+              - condition: numeric_state
+                entity: sensor.softener_total_treated_water
+                below: 1
+            card:
+              type: custom:mushroom-template-card
+              grid_options:
+                columns: 12
+              primary: No water treated yet
+              secondary: The softener counts 0 L. The graphs stay flat until water runs.
+              multiline_secondary: true
+              icon: mdi:water-off-outline
+              icon_color: grey
+              tap_action:
+                action: more-info
+                entity: sensor.softener_total_treated_water
 
-      # Live values --------------------------------------------------------
-      - type: horizontal-stack
+          - type: conditional
+            conditions:
+              - condition: numeric_state
+                entity: sensor.softener_salt_level
+                below: 25
+            card:
+              type: custom:mushroom-template-card
+              primary: Refill the salt tank
+              secondary: >-
+                Only {{ states('sensor.softener_salt_level') }} % left, about
+                {{ states('sensor.softener_days_until_regeneration') }} days of soft water
+              icon: mdi:shaker-alert
+              icon_color: orange
+              tap_action:
+                action: more-info
+                entity: sensor.softener_salt_level
+
+          - type: horizontal-stack
+            cards:
+              - type: custom:mushroom-template-card
+                primary: Remaining
+                secondary: '{{ states("sensor.softener_remaining_water") }} L'
+                icon: mdi:water
+                icon_color: blue
+                layout: vertical
+                tap_action:
+                  action: more-info
+                  entity: sensor.softener_remaining_water
+              - type: custom:mushroom-template-card
+                primary: Days left
+                secondary: '{{ states("sensor.softener_days_until_regeneration") }} d'
+                icon: mdi:calendar-end
+                icon_color: >-
+                  {% set d = states('sensor.softener_days_until_regeneration') | float(99) %}
+                  {% if d <= 3 %} red {% elif d <= 7 %} orange {% else %} green {% endif %}
+                layout: vertical
+                tap_action:
+                  action: more-info
+                  entity: sensor.softener_days_until_regeneration
+
+      # Water use ----------------------------------------------------------
+      - type: grid
+        cards:
+          - type: horizontal-stack
+            cards:
+              - type: custom:mushroom-template-card
+                primary: Used today
+                secondary: '{{ states("sensor.softener_daily_consumption") }} L'
+                icon: mdi:water-outline
+                icon_color: blue
+                layout: vertical
+                tap_action:
+                  action: more-info
+                  entity: sensor.softener_daily_consumption
+              - type: custom:mushroom-template-card
+                primary: Flow now
+                secondary: '{{ states("sensor.softener_water_flow") }} L/min'
+                icon: mdi:water-pump
+                icon_color: >-
+                  {% if states('sensor.softener_water_flow') | float(0) > 0 %} cyan {% else %} disabled {% endif %}
+                layout: vertical
+                tap_action:
+                  action: more-info
+                  entity: sensor.softener_water_flow
+
+          - type: custom:mini-graph-card
+            name: Water flow, last 24 h
+            entities:
+              - entity: sensor.softener_water_flow
+                color: '#00bcd4'
+            hours_to_show: 24
+            points_per_hour: 12
+            aggregate_func: max
+            line_width: 3
+            height: 120
+            tap_action:
+              action: more-info
+              entity: sensor.softener_water_flow
+            show:
+              labels: false
+              fill: true
+              state: false
+
+          - type: custom:mini-graph-card
+            name: Softened water per day
+            entities:
+              - entity: sensor.softener_daily_consumption
+                color: '#2196f3'
+            days_to_show: 7
+            group_by: date
+            aggregate_func: max
+            line_width: 3
+            height: 130
+            tap_action:
+              action: more-info
+              entity: sensor.softener_daily_consumption
+            show:
+              labels: true
+              fill: true
+              state: false
+              extrema: true
+
+          - type: custom:mushroom-template-card
+            grid_options:
+              columns: 12
+            primary: Total treated water
+            secondary: >-
+              {{ states("sensor.softener_total_treated_water") }} L since install
+            icon: mdi:chart-bar
+            icon_color: teal
+            tap_action:
+              action: more-info
+              entity: sensor.softener_total_treated_water
+
+      # Maintenance and device ---------------------------------------------
+      - type: grid
         cards:
           - type: custom:mushroom-template-card
-            primary: Remaining water
-            secondary: '{{ states("sensor.softener_remaining_water") }} L'
-            icon: mdi:water
-            icon_color: blue
-            layout: vertical
-            tap_action:
-              action: more-info
-              entity: sensor.softener_remaining_water
-          - type: custom:mushroom-template-card
-            primary: Days left
-            secondary: '{{ states("sensor.softener_days_until_regeneration") }} d'
-            icon: mdi:calendar-end
+            primary: Last regen
+            secondary: >-
+              {% set lr = as_datetime(states('sensor.softener_last_regeneration')) %}
+              {% if lr %} {{ relative_time(lr) }} ago {% else %} Never yet {% endif %}
+            icon: mdi:history
             icon_color: >-
-              {% set d = states('sensor.softener_days_until_regeneration') | float(99) %}
-              {% if d <= 3 %} red {% elif d <= 7 %} orange {% else %} green {% endif %}
-            layout: vertical
+              {% set lr = as_datetime(states('sensor.softener_last_regeneration')) %}
+              {% if lr %} green {% else %} disabled {% endif %}
+            tap_action:
+              action: none
+
+          - type: custom:mushroom-template-card
+            primary: Regenerations
+            secondary: '{{ states("sensor.softener_regenerations") }} since install'
+            icon: mdi:counter
+            icon_color: indigo
             tap_action:
               action: more-info
-              entity: sensor.softener_days_until_regeneration
+              entity: sensor.softener_regenerations
 
-      # Flow and history ---------------------------------------------------
-      - type: custom:mini-graph-card
-        name: Water flow, last 24 h
-        entities:
-          - entity: sensor.softener_water_flow
-            color: '#00bcd4'
-        hours_to_show: 24
-        points_per_hour: 12
-        aggregate_func: max
-        line_width: 2
-        lower_bound: 0
-        height: 90
-        tap_action:
-          action: more-info
-          entity: sensor.softener_water_flow
-        show:
-          labels: false
-          fill: true
-          state: true
+          - type: custom:mushroom-template-card
+            primary: Device status
+            secondary: '{{ states("sensor.softener_status") }}'
+            icon: mdi:state-machine
+            icon_color: green
+            tap_action:
+              action: more-info
+              entity: sensor.softener_status
 
-      - type: custom:mini-graph-card
-        name: Softened water per day
-        entities:
-          - entity: sensor.softener_daily_consumption
-            color: '#2196f3'
-        days_to_show: 7
-        group_by: date
-        aggregate_func: max
-        line_width: 2
-        lower_bound: 0
-        height: 105
-        tap_action:
-          action: more-info
-          entity: sensor.softener_daily_consumption
-        show:
-          labels: false
-          fill: true
+          - type: custom:mushroom-template-card
+            primary: Firmware
+            secondary: '{{ states("sensor.softener_software_version") | trim }}'
+            icon: mdi:information-outline
+            icon_color: grey
+            tap_action:
+              action: none
 
-      # Maintenance --------------------------------------------------------
-      - type: custom:bubble-card
-        card_type: separator
-        name: Maintenance
-        icon: mdi:calendar-clock
-
-      - type: custom:mushroom-template-card
-        primary: Last regeneration
-        secondary: >-
-          {% set lr = as_datetime(states('sensor.softener_last_regeneration')) %}
-          {% if lr %} {{ relative_time(lr) }} ago {% else %} Never yet {% endif %}
-        icon: mdi:history
-        icon_color: >-
-          {% set lr = as_datetime(states('sensor.softener_last_regeneration')) %}
-          {% if lr %} green {% else %} disabled {% endif %}
-        tap_action:
-          action: none
-
-      - type: custom:mushroom-template-card
-        primary: Regenerations
-        secondary: '{{ states("sensor.softener_regenerations") }} since install'
-        icon: mdi:counter
-        icon_color: indigo
-        tap_action:
-          action: more-info
-          entity: sensor.softener_regenerations
-
-      - type: custom:mushroom-template-card
-        primary: Total treated water
-        secondary: '{{ states("sensor.softener_total_treated_water") }} L'
-        icon: mdi:chart-bar
-        icon_color: teal
-        tap_action:
-          action: more-info
-          entity: sensor.softener_total_treated_water
-
-      # Device -------------------------------------------------------------
-      - type: custom:bubble-card
-        card_type: separator
-        name: Device
-        icon: mdi:chip
-
-      - type: custom:mushroom-template-card
-        primary: Status
-        secondary: '{{ states("sensor.softener_status") }}'
-        icon: mdi:state-machine
-        icon_color: green
-        tap_action:
-          action: more-info
-          entity: sensor.softener_status
-
-      - type: custom:mushroom-template-card
-        primary: Software version
-        secondary: '{{ states("sensor.softener_software_version") | trim }}'
-        icon: mdi:information-outline
-        icon_color: grey
-        tap_action:
-          action: none
+          - type: custom:mushroom-template-card
+            primary: Serial number
+            secondary: '{{ device_attr("sensor.softener_status", "serial_number") }}'
+            icon: mdi:barcode
+            icon_color: grey
+            tap_action:
+              action: none
