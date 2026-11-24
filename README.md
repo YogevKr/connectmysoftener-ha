@@ -26,6 +26,16 @@ Not affiliated with Pentair, Erie or Van Marcke. Use at your own risk.
 
 The device page also shows the serial number and the software version.
 
+### Controls
+
+| Entity | Notes |
+| --- | --- |
+| `switch.<device>_holiday_mode` | Turns holiday (vacation) mode on or off |
+| `number.<device>_holiday_days` | Holiday length in days, 0 to 40. 0 turns it off |
+| `button.<device>_regenerate_now` | Starts a regeneration at once |
+| `button.<device>_regenerate_at_scheduled_time` | Starts a regeneration at the set time |
+| `button.<device>_salt_added` | Tells the softener that you added salt |
+
 ## Screenshot
 
 ![Softener dashboard](preview.png)
@@ -52,6 +62,9 @@ HACS. Delete the `theme:` line to keep the default theme.
 The integration logs in to the Pentair cloud API with the account of the
 ConnectMySoftener app. It polls the API and never talks to the softener
 directly.
+
+The controls write to the same cloud API. The cloud sends the change to the
+softener.
 
 ```mermaid
 graph LR
@@ -92,6 +105,9 @@ almost always misses the flow.
   source.
 - A flow reading is a snapshot. Short water use can stay unseen.
 - The API is private and can change without notice.
+- A control change shows in Home Assistant only after the next poll. This can
+  take 30 seconds.
+- On the tested unit, each holiday length above 0 starts the full 40 days.
 - The payload of `last_regeneration` is empty on a new device. The parser
   reads ISO 8601 and a few common shapes, and logs a warning when it meets an
   unknown shape.

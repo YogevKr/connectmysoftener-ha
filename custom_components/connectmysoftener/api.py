@@ -15,6 +15,7 @@ from typing import Any
 
 import aiohttp
 
+from .const import APP_VERSION, DEFAULT_LANGUAGE, HOLIDAY_MODE_MAX_DAYS, REGEN_NOW
 from .exceptions import CannotConnect, InvalidAuth
 
 _LOGGER = logging.getLogger(__name__)
@@ -114,6 +115,8 @@ def parse_data(raw: dict[str, Any]) -> dict[str, Any]:
         if isinstance(software, str) and software.strip()
         else None,
         "serial_number": serial if isinstance(serial, str) and serial else None,
+        "holiday_mode": dashboard.get("holiday_mode"),
+        "status_code": status.get("code"),
     }
 
 
@@ -169,38 +172,57 @@ class ConnectMySoftenerApi:
             if value:
                 self._auth_headers[key] = str(value).strip()
 
-    async def _async_request(self, path: str, *, retry_on_auth_error: bool = True) -> Any:
-        """Run one authenticated GET request."""
+    async def _async_request(
+        self,
+        path: str,
+        *,
+        method: str = "GET",
+        json: Any = None,
+        retry_on_auth_error: bool = True,
+    ) -> Any:
+        """Run one authenticated request. GET by default; pass method/json to write."""
         if not self._auth_headers:
             async with self._auth_lock:
                 if not self._auth_headers:
                     await self.async_authenticate()
 
+        headers = dict(self._auth_headers)
+        headers["language"] = DEFAULT_LANGUAGE
+        headers["app_version"] = APP_VERSION
+
         try:
-            response = await self._session.get(
+            response = await self._session.request(
+                method,
                 f"{self._base_url}/{path}",
-                headers=self._auth_headers,
+                headers=headers,
+                json=json,
                 timeout=REQUEST_TIMEOUT,
             )
         except (aiohttp.ClientError, TimeoutError, RuntimeError) as err:
-            raise CannotConnect(f"GET {path} failed: {err}") from err
+            raise CannotConnect(f"{method} {path} failed: {err}") from err
 
         async with response:
             if response.status == 401 and retry_on_auth_error:
                 _LOGGER.debug("Session expired, logging in again")
                 async with self._auth_lock:
                     await self.async_authenticate()
-                return await self._async_request(path, retry_on_auth_error=False)
+                return await self._async_request(
+                    path, method=method, json=json, retry_on_auth_error=False
+                )
 
             self._store_auth_headers(response.headers)
 
+            if response.status == 426:
+                raise CannotConnect("The API requires an app update (HTTP 426)")
             if response.status >= 400:
-                raise CannotConnect(f"GET {path} returned HTTP {response.status}")
+                raise CannotConnect(f"{method} {path} returned HTTP {response.status}")
 
             try:
                 return await response.json(content_type=None)
             except (aiohttp.ClientError, ValueError) as err:
-                raise CannotConnect(f"GET {path} returned no JSON: {err}") from err
+                if method == "GET":
+                    raise CannotConnect(f"{method} {path} returned no JSON: {err}") from err
+                return None
 
     async def async_get_devices(self) -> list[dict[str, Any]]:
         """Return every softener of the account."""
@@ -261,3 +283,22 @@ class ConnectMySoftenerApi:
         if not isinstance(data, dict):
             return None
         return parse_number(data.get("flow"))
+
+    async def async_save_settings(self, device_id: int | str, data: dict[str, Any]) -> Any:
+        """Write changed stat fields via PUT /water_softeners/{id}/stats."""
+        return await self._async_request(
+            f"water_softeners/{device_id}/stats", method="PUT", json=data
+        )
+
+    async def async_set_holiday_mode(self, device_id: int | str, days: int) -> Any:
+        """Set holiday mode. 0 = off; 1..max = on for that many days."""
+        days = max(0, min(int(days), HOLIDAY_MODE_MAX_DAYS))
+        return await self.async_save_settings(device_id, {"holiday_mode": days})
+
+    async def async_set_salt_added(self, device_id: int | str) -> Any:
+        """Tell the softener the salt was refilled."""
+        return await self.async_save_settings(device_id, {"salt_added": True})
+
+    async def async_regenerate(self, device_id: int | str, regen_type: int = REGEN_NOW) -> Any:
+        """Start a regeneration. REGEN_NOW = immediate; REGEN_AT_SCHEDULED = at the set time."""
+        return await self.async_save_settings(device_id, {"regenerate": int(regen_type)})
